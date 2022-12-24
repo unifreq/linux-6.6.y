@@ -2,38 +2,36 @@
 /*
  * Copyright (c) 2019 BayLibre SAS. All rights reserved.
  * Copyright (c) 2020 Christian Hewitt <christianshewitt@gmail.com>
- * Copyright (c) 2021 flippy <uniqfreq@gmail.com>
+ * Copyright (c) 2022 flippy <uniqfreq@gmail.com>
  */
 
 /dts-v1/;
 
 #include "meson-sm1-ac2xx.dtsi"
-#include <dt-bindings/leds/common.h>
 #include <dt-bindings/sound/meson-g12a-tohdmitx.h>
 
 / {
-	compatible = "skyworth,lb2004", "amlogic,s905x3", "amlogic,sm1";
-	model = "SKYWORTH LB2004-A4091";
+	compatible = "tanix,tx3-qz", "amlogic,sm1";
+	model = "Tanix TX3 (QZ)";
+
+	leds {
+		compatible = "gpio-leds";
+		
+		sys_led {
+			led_name = "sys_led";
+                        gpios = <&gpio_ao GPIOAO_11 GPIO_ACTIVE_LOW>;
+			default-state = "on";
+		};
+	};
 
 	memory@0 {
 		device_type = "memory";
 		reg = <0x0 0x0 0x0 0xFFFFFFFF>;
 	};
 
-	leds {
-		compatible = "gpio-leds";
-
-		/* Mainline u-boot lacks TCA6507 driver. Currently only using bootloader, TCA6507 LEDs works. */
-		gpio_led {
-			label = "gpio_led";
-			gpios = <&gpio_ao GPIOAO_11 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "default-on";
-		};
-	};
-
 	sound {
 		compatible = "amlogic,axg-sound-card";
-		model = "LB2004-A4091";
+		model = "TX3";
 		audio-aux-devs = <&tdmout_b>;
 		audio-routing = "TDMOUT_B IN 0", "FRDDR_A OUT 1",
 				"TDMOUT_B IN 1", "FRDDR_B OUT 1",
@@ -96,36 +94,6 @@
 	};
 };
 
-&i2c3 {
-	status = "okay";
-
-	/* Mainline u-boot lacks TCA6507 driver. Currently only using bootloader, TCA6507 LEDs works. */
-	tca6507@45 {
-		compatible = "ti,tca6507", "leds,tca6507";
-		reg = <0x45>;
-		status = "okay";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		gpio-controller;
-		#gpio-cells = <2>;
-
-		led@red {
-			reg = <0x00>;
-			linux,default-trigger = "heartbeat";
-		};
-
-		led@green {
-			reg = <0x01>;
-			linux,default-trigger = "heartbeat";
-		};
-
-		led@blue {
-			reg = <0x02>;
-			linux,default-trigger = "none";
-		};
-	};
-};
-
 &vddcpu {
 	regulator-min-microvolt = <721000>;
 	regulator-max-microvolt = <1022000>;
@@ -145,10 +113,10 @@
 
 	pinctrl-0 = <&eth_pins>, <&eth_rgmii_pins>;
 	pinctrl-names = "default";
+	phy-mode = "rgmii-txid";
 	phy-handle = <&external_phy>;
 
-	phy-mode = "rgmii";
-	amlogic,tx-delay-ns = <2>;
+	rx-internal-delay-ps = <800>;
 
 	snps,aal;
 	snps,rxpbl = <0x8>;
@@ -163,14 +131,11 @@
 
 &ext_mdio {
 	external_phy: ethernet-phy@0 {
-		/* 
-		 * Realtek RTL8211F (0x001cc916) 
-		 * JLSemi JL2101 (0x937c4032)
-		 */
+		/* Realtek RTL8211F (0x001cc916) */
 		reg = <0>;
 		max-speed = <1000>;
 
-		reset-assert-us = <30000>;
+		reset-assert-us = <10000>;
 		reset-deassert-us = <80000>;
 		reset-gpios = <&gpio GPIOZ_15 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
 
@@ -192,10 +157,6 @@
 	status = "okay";
 };
 
-&ir {
-	status = "disabled";
-};
-
 &tdmif_b {
 	status = "okay";
 };
@@ -209,23 +170,18 @@
 };
 
 &uart_A {
-	status = "disabled";
+	status = "okay";
+
 	pinctrl-0 = <&uart_a_pins>, <&uart_a_cts_rts_pins>;
 	pinctrl-names = "default";
 	uart-has-rtscts;
 
-	bluetooth: bluetooth {
-		compatible = "realtek,rtl8822cs-bt";
-		interrupt-parent = <&gpio_intc>;
-		interrupts = <95 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "host-wakeup";
+	bluetooth {
+		compatible = "brcm,bcm43438-bt";
 		shutdown-gpios = <&gpio GPIOX_17 GPIO_ACTIVE_HIGH>;
 		max-speed = <2000000>;
 		clocks = <&wifi32k>;
 		clock-names = "lpo";
-		vbat-supply = <&vddao_3v3>;
-		vddio-supply = <&vddio_ao1v8>;
-		status = "disabled";
 	};
 };
 
@@ -239,22 +195,24 @@
 
 /* SDIO */
 &sd_emmc_a {
-	sd-uhs-sdr12;
-	sd-uhs-sdr25;
-	sd-uhs-ddr50;
+	/delete-property/ sd-uhs-sdr104;
 	sd-uhs-sdr50;
-	sd-uhs-sdr104;
-	max-frequency = <208000000>;
+	max-frequency = <100000000>;
+
+        //sd-uhs-ddr50;
+	//max-frequency = <50000000>;
+
+	//sd-uhs-sdr104;
+	//max-frequency = <200000000>;
 };
 
 /* SD card */
 &sd_emmc_b {
-	status = "disabled";
+	max-frequency = <50000000>;
 };
 
 /* eMMC */
 &sd_emmc_c {
-	mmc-sdr-1_8v;
 	max-frequency = <200000000>;
 };
 
@@ -262,6 +220,11 @@
 	opp-2016000000 {
 		opp-hz = /bits/ 64 <2016000000>;
 		opp-microvolt = <1000000>;
+	};
+
+	opp-2100000000 {
+		opp-hz = /bits/ 64 <2100000000>;
+		opp-microvolt = <1011000>;
 	};
 };
 
