@@ -952,6 +952,8 @@
 		resets = <&cru SRST_GMAC2IO_A>;
 		reset-names = "stmmaceth";
 		rockchip,grf = <&grf>;
+		tx-fifo-depth = <2048>;
+		rx-fifo-depth = <4096>;
 		snps,txpbl = <0x4>;
 		status = "disabled";
 	};
@@ -974,6 +976,8 @@
 		reset-names = "stmmaceth";
 		phy-mode = "rmii";
 		phy-handle = <&phy>;
+		tx-fifo-depth = <2048>;
+		rx-fifo-depth = <4096>;
 		snps,txpbl = <0x4>;
 		clock_in_out = "output";
 		status = "disabled";
