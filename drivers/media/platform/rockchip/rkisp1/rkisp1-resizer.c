@@ -456,11 +456,12 @@ static void rkisp1_rsz_set_sink_crop(struct rkisp1_resizer *rsz,
 	sink_crop = v4l2_subdev_get_pad_crop(&rsz->sd, sd_state,
 					     RKISP1_RSZ_PAD_SINK);
 
-	/* Not crop for MP bayer raw data */
+	/* Not crop for MP bayer raw data, or for devices lacking dual crop. */
 	mbus_info = rkisp1_mbus_info_get_by_code(sink_fmt->code);
 
-	if (rsz->id == RKISP1_MAINPATH &&
-	    mbus_info->pixel_enc == V4L2_PIXEL_ENC_BAYER) {
+	if ((rsz->id == RKISP1_MAINPATH &&
+	     mbus_info->pixel_enc == V4L2_PIXEL_ENC_BAYER) ||
+	    !rkisp1_has_feature(rsz->rkisp1, DUAL_CROP)) {
 		sink_crop->left = 0;
 		sink_crop->top = 0;
 		sink_crop->width = sink_fmt->width;
@@ -651,7 +652,8 @@ static int rkisp1_rsz_s_stream(struct v4l2_subdev *sd, int enable)
 	struct v4l2_subdev_state *sd_state;
 
 	if (!enable) {
-		rkisp1_dcrop_disable(rsz, RKISP1_SHADOW_REGS_ASYNC);
+		if (rkisp1_has_feature(rkisp1, DUAL_CROP))
+			rkisp1_dcrop_disable(rsz, RKISP1_SHADOW_REGS_ASYNC);
 		rkisp1_rsz_disable(rsz, RKISP1_SHADOW_REGS_ASYNC);
 		return 0;
 	}
@@ -662,7 +664,8 @@ static int rkisp1_rsz_s_stream(struct v4l2_subdev *sd, int enable)
 	sd_state = v4l2_subdev_lock_and_get_active_state(sd);
 
 	rkisp1_rsz_config(rsz, sd_state, when);
-	rkisp1_dcrop_config(rsz, sd_state);
+	if (rkisp1_has_feature(rkisp1, DUAL_CROP))
+		rkisp1_dcrop_config(rsz, sd_state);
 
 	v4l2_subdev_unlock_state(sd_state);
 
