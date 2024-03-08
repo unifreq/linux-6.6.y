@@ -5325,7 +5325,7 @@ static void
 rtl8125_enable_d0_speedup(struct rtl8125_private *tp)
 {
         u16 clearmask;
-        u16 setmask;
+        u16 setmask = 0;
 
         if (FALSE == HW_SUPPORT_D0_SPEED_UP(tp))
                 return;
