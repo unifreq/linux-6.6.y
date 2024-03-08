@@ -92,7 +92,7 @@ ifeq ($(CONFIG_R8125_TX_NO_CLOSE), y)
 endif
 
 ifeq ($(CONFIG_R8125_MULTI_MSIX_VECTOR), y)
-	ifeq ($(CONFIG_R8125_MULTIPLE_RX_QUEUE), y)
+	ifeq ($(CONFIG_R8125_RSS_SUPPORT), y)
 		r8125-objs += r8125_rss.o
 		EXTRA_CFLAGS += -DENABLE_RSS_SUPPORT
 	endif
