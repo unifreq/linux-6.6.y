@@ -979,7 +979,35 @@ static struct wireless_dev *brcmf_cfg80211_add_iface(struct wiphy *wiphy,
 	struct brcmf_cfg80211_info *cfg = wiphy_to_cfg(wiphy);
 	struct brcmf_pub *drvr = cfg->pub;
 	struct wireless_dev *wdev;
+	struct net_device *dev;
 	int err;
+
+	/*
+	 * There is a bug with in-firmware BSS management. When adding virtual
+	 * interface brcmfmac first tells firmware to create new BSS and then
+	 * it creates new struct net_device.
+	 *
+	 * If creating/registering netdev(ice) fails, BSS remains in some bugged
+	 * state. It conflicts with existing BSSes by overtaking their auth
+	 * requests.
+	 *
+	 * It results in one BSS (addresss X) sending beacons and another BSS
+	 * (address Y) replying to authentication requests. This makes interface
+	 * unusable as AP.
+	 *
+	 * To workaround this bug we may try to guess if register_netdev(ice)
+	 * will fail. The most obvious case is using interface name that already
+	 * exists. This is actually quite likely with brcmfmac & some user space
+	 * scripts as brcmfmac doesn't allow deleting virtual interfaces.
+	 * So this bug can be triggered even by something trivial like:
+	 * iw dev wlan0 delete
+	 * iw phy phy0 interface add wlan0 type __ap
+	 */
+	dev = dev_get_by_name(&init_net, name);
+	if (dev) {
+		dev_put(dev);
+		return ERR_PTR(-ENFILE);
+	}
 
 	brcmf_dbg(TRACE, "enter: %s type %d\n", name, type);
 	err = brcmf_vif_add_validate(wiphy_to_cfg(wiphy), type);
@@ -3299,6 +3327,10 @@ brcmf_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *ndev,
 	 * preference in cfg struct to apply this to
 	 * FW later while initializing the dongle
 	 */
+#if defined(CONFIG_ARCH_BCM2835)
+	brcmf_dbg(INFO, "power management disabled\n");
+	enabled = false;
+#endif
 	cfg->pwr_save = enabled;
 	if (!check_vif_up(ifp->vif)) {
 
@@ -7957,6 +7989,7 @@ static s32 brcmf_translate_country_code(struct brcmf_pub *drvr, char alpha2[2],
 	return 0;
 }
 
+#if !defined(CONFIG_ARCH_BCM2835)
 static int
 brcmf_parse_dump_obss(char *buf, struct brcmf_dump_survey *survey)
 {
@@ -8179,6 +8212,7 @@ exit:
 		brcmf_set_mpc(ifp, 1);
 	return err;
 }
+#endif /* CONFIG_ARCH_BCM2835 */
 
 static void brcmf_cfg80211_reg_notifier(struct wiphy *wiphy,
 					struct regulatory_request *req)
@@ -8331,8 +8365,10 @@ struct brcmf_cfg80211_info *brcmf_cfg80211_attach(struct brcmf_pub *drvr,
 	if (brcmf_feat_is_enabled(ifp, BRCMF_FEAT_WOWL_GTK))
 		ops->set_rekey_data = brcmf_cfg80211_set_rekey_data;
 #endif
+#if !defined(CONFIG_ARCH_BCM2835)
 	if (brcmf_feat_is_enabled(ifp, BRCMF_FEAT_DUMP_OBSS))
 		ops->dump_survey = brcmf_cfg80211_dump_survey;
+#endif /* CONFIG_ARCH_BCM2835 */
 
 	err = wiphy_register(wiphy);
 	if (err < 0) {
