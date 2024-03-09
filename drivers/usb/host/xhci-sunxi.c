@@ -95,6 +95,7 @@ static void xhci_sunxi_quirks(struct device *dev, struct xhci_hcd *xhci)
 	xhci->quirks |= XHCI_PLAT;
 }
 
+#if 0
 static void xhci_sunxi_soft_reset(struct xhci_sunxi *sunxi)
 {
 	u32 val;
@@ -134,6 +135,7 @@ static void xhci_sunxi_soft_reset(struct xhci_sunxi *sunxi)
 	val &= ~SUNXI_GCTL_CORESOFTRESET;
 	writel(val, sunxi->regs + SUNXI_GLOBALS_REGS_GCTL);
 }
+#endif
 
 static void xhci_sunxi_init_phy(struct xhci_sunxi *sunxi)
 {
