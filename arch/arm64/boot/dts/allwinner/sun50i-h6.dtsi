@@ -341,6 +341,7 @@
 			interrupt-controller;
 			#interrupt-cells = <3>;
 
+			/omit-if-no-ref/
 			ext_rgmii_pins: rgmii-pins {
 				pins = "PD0", "PD1", "PD2", "PD3", "PD4",
 				       "PD5", "PD7", "PD8", "PD9", "PD10",
@@ -404,6 +405,7 @@
 				function = "pwm1";
 			};
 
+			/omit-if-no-ref/
 			mmc2_pins: mmc2-pins {
 				pins = "PC1", "PC4", "PC5", "PC6",
 				       "PC7", "PC8", "PC9", "PC10",
@@ -411,6 +413,30 @@
 				function = "mmc2";
 				drive-strength = <30>;
 				bias-pull-up;
+			};
+
+			/omit-if-no-ref/
+			uart2_pins: uart2-pins {
+				pins = "PD19", "PD20";
+				function = "uart2";
+			};
+
+			/omit-if-no-ref/
+			uart2_rts_cts_pins: uart2-rts-cts-pins {
+				pins = "PD21", "PD22";
+				function = "uart2";
+			};
+
+			/omit-if-no-ref/
+			uart3_pins: uart3-pins {
+				pins = "PD23", "PD24";
+				function = "uart3";
+			};
+
+			/omit-if-no-ref/
+			uart3_rts_cts_pins: uart3-rts-cts-pins {
+				pins = "PD25", "PD26";
+				function = "uart3";
 			};
 
 			/omit-if-no-ref/
@@ -1052,6 +1078,11 @@
 				pins = "PL0", "PL1";
 				function = "s_rsb";
 			};
+
+			r_uart_pins: r-uart-pins {
+				pins = "PL2", "PL3";
+				function = "s_uart";
+			};
 		};
 
 		r_ir: ir@7040000 {
@@ -1066,6 +1097,19 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&r_ir_rx_pin>;
 				status = "disabled";
+		};
+
+		r_uart: serial@7080000 {
+			compatible = "snps,dw-apb-uart";
+			reg = <0x07080000 0x400>;
+			interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
+			reg-shift = <2>;
+			reg-io-width = <4>;
+			clocks = <&r_ccu CLK_R_APB2_UART>;
+			resets = <&r_ccu RST_R_APB2_UART>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&r_uart_pins>;
+			status = "disabled";
 		};
 
 		r_i2c: i2c@7081400 {
