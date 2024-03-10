@@ -187,6 +187,7 @@ restart:
 	return active;
 }
 
+#if 0
 static void
 xt_flowoffload_check_hook(struct flow_offload *flow, void *data)
 {
@@ -205,13 +206,14 @@ xt_flowoffload_check_hook(struct flow_offload *flow, void *data)
 	}
 	spin_unlock_bh(&hooks_lock);
 }
+#endif
 
 static void
 xt_flowoffload_hook_work(struct work_struct *work)
 {
 	struct xt_flowoffload_table *table;
 	struct xt_flowoffload_hook *hook;
-	int err;
+	int err = 0;
 
 	table = container_of(work, struct xt_flowoffload_table, work.work);
 
@@ -440,9 +442,14 @@ xt_flowoffload_route(struct sk_buff *skb, const struct nf_conn *ct,
 		break;
 	}
 
-	nf_route(xt_net(par), &other_dst, &fl, false, xt_family(par));
-	if (!other_dst)
+	if (!dst_hold_safe(this_dst))
 		return -ENOENT;
+
+	nf_route(xt_net(par), &other_dst, &fl, false, xt_family(par));
+	if (!other_dst) {
+		dst_release(this_dst);
+		return -ENOENT;
+	}
 
 	nf_default_forward_path(route, this_dst, dir, devs);
 	nf_default_forward_path(route, other_dst, !dir, devs);
