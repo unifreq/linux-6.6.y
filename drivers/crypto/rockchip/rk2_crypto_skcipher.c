@@ -557,9 +557,11 @@ int rk2_cipher_tfm_init(struct crypto_skcipher *tfm)
 		return PTR_ERR(ctx->fallback_tfm);
 	}
 
+	/*
 	dev_info(algt->dev->dev, "Fallback for %s is %s\n",
 		 crypto_tfm_alg_driver_name(&tfm->base),
 		 crypto_tfm_alg_driver_name(crypto_skcipher_tfm(ctx->fallback_tfm)));
+	*/
 
 	tfm->reqsize = sizeof(struct rk2_cipher_rctx) +
 		crypto_skcipher_reqsize(ctx->fallback_tfm);
