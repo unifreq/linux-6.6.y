@@ -129,7 +129,7 @@ efi_status_t efi_kaslr_relocate_kernel(unsigned long *image_addr,
 	if (status != EFI_SUCCESS) {
 		if (!check_image_region(*image_addr, kernel_memsize)) {
 			efi_err("FIRMWARE BUG: Image BSS overlaps adjacent EFI memory region\n");
-		} else if (IS_ALIGNED(*image_addr, min_kimg_align) &&
+		} else if (IS_ALIGNED(*image_addr - TEXT_OFFSET, min_kimg_align) &&
 			   (unsigned long)_end < EFI_ALLOC_LIMIT) {
 			/*
 			 * Just execute from wherever we were loaded by the
@@ -151,7 +151,7 @@ efi_status_t efi_kaslr_relocate_kernel(unsigned long *image_addr,
 	}
 
 	memcpy((void *)*reserve_addr, (void *)*image_addr, kernel_size);
-	*image_addr = *reserve_addr;
+	*image_addr = *reserve_addr + TEXT_OFFSET % min_kimg_align;;
 	efi_icache_sync(*image_addr, *image_addr + kernel_codesize);
 	efi_remap_image(*image_addr, *reserve_size, kernel_codesize);
 
