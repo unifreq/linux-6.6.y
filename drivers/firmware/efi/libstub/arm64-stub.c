@@ -22,6 +22,8 @@ efi_status_t handle_kernel_image(unsigned long *image_addr,
 				 efi_handle_t image_handle)
 {
 	efi_status_t status;
+	u64 min_kimg_align = efi_get_kimg_min_align();
+
 	unsigned long kernel_size, kernel_codesize, kernel_memsize;
 
 	if (image->image_base != _text) {
@@ -36,7 +38,7 @@ efi_status_t handle_kernel_image(unsigned long *image_addr,
 	kernel_size = _edata - _text;
 	kernel_codesize = __inittext_end - _text;
 	kernel_memsize = kernel_size + (_end - _edata);
-	*reserve_size = kernel_memsize;
+	*reserve_size = kernel_memsize + TEXT_OFFSET % min_kimg_align;
 	*image_addr = (unsigned long)_text;
 
 	status = efi_kaslr_relocate_kernel(image_addr,
