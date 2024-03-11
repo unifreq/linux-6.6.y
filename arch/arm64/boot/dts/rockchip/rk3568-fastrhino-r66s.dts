@@ -3,8 +3,8 @@
 #include "rk3568-fastrhino-r66s.dtsi"
 
 / {
-	model = "Lunzn FastRhino R66S";
-	compatible = "lunzn,fastrhino-r66s", "rockchip,rk3568";
+	model = "FastRhino R66S";
+	compatible = "fastrhino,r66s", "rockchip,rk3568";
 
 	aliases {
 		mmc0 = &sdmmc0;
@@ -15,8 +15,8 @@
 	bus-width = <4>;
 	cap-mmc-highspeed;
 	cap-sd-highspeed;
+	cd-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_LOW>;
 	disable-wp;
-	max-frequency = <150000000>;
 	no-sdio;
 	no-mmc;
 	pinctrl-names = "default";

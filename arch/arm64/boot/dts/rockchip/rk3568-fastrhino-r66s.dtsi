@@ -35,6 +35,7 @@
 			color = <LED_COLOR_ID_BLUE>;
 			function = LED_FUNCTION_STATUS;
 			gpios = <&gpio0 RK_PC0 GPIO_ACTIVE_HIGH>;
+			label = "blue:working";
 			linux,default-trigger = "heartbeat";
 		};
 	};
@@ -367,6 +368,19 @@
 	reset-gpios = <&gpio0 RK_PC3 GPIO_ACTIVE_HIGH>;
 	vpcie3v3-supply = <&vcc3v3_pcie>;
 	status = "okay";
+
+	pcie@0,0 {
+		reg = <0x00100000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		rtl8125_1: pcie-eth@10,0 {
+			compatible = "pci10ec,8125";
+			reg = <0x000000 0 0 0 0>;
+
+			realtek,led-data = <0x0238>;
+		};
+	};
 };
 
 &pcie3x2 {
@@ -374,6 +388,19 @@
 	reset-gpios = <&gpio0 RK_PC6 GPIO_ACTIVE_HIGH>;
 	vpcie3v3-supply = <&vcc3v3_pcie>;
 	status = "okay";
+
+	pcie@0,0 {
+		reg = <0x00200000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		rtl8125_2: pcie-eth@20,0 {
+			compatible = "pci10ec,8125";
+			reg = <0x000000 0 0 0 0>;
+
+			realtek,led-data = <0x0238>;
+		};
+	};
 };
 
 &pinctrl {
@@ -414,6 +441,10 @@
 	status = "okay";
 };
 
+&rng {
+	status = "okay";
+};
+
 &saradc {
 	vref-supply = <&vcca_1v8>;
 	status = "okay";
@@ -430,11 +461,11 @@
 };
 
 &usb_host0_ehci {
-	status = "okay";
+	status = "disabled";
 };
 
 &usb_host0_ohci {
-	status = "okay";
+	status = "disabled";
 };
 
 &usb_host0_xhci {
@@ -444,11 +475,11 @@
 };
 
 &usb_host1_ehci {
-	status = "okay";
+	status = "disabled";
 };
 
 &usb_host1_ohci {
-	status = "okay";
+	status = "disabled";
 };
 
 &usb_host1_xhci {
@@ -467,6 +498,18 @@
 &usb2phy0_otg {
 	phy-supply = <&vcc5v0_usb_otg>;
 	status = "okay";
+};
+
+&usb2phy1 {
+	status = "disabled";
+};
+
+&usb2phy1_host {
+	status = "disabled";
+};
+
+&usb2phy1_otg {
+	status = "disabled";
 };
 
 &vop {
