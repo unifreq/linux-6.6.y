@@ -172,6 +172,42 @@
 	cpu-supply = <&vdd_cpu>;
 };
 
+&cpu0_opp_table {
+
+	opp-408000000 {
+		opp-microvolt = <900000 900000 1200000>;
+	};
+
+	opp-600000000 {
+		opp-microvolt = <900000 900000 1200000>;
+	};
+
+	opp-816000000 {
+		opp-microvolt = <900000 900000 1200000>;
+	};
+
+	opp-1104000000 {
+		opp-microvolt = <900000 900000 1200000>;
+	};
+
+	opp-1416000000 {
+		opp-microvolt = <950000 950000 1200000>;
+	};
+
+	opp-1608000000 {
+		opp-microvolt = <1050000 1050000 1200000>;
+	};
+
+	opp-1800000000 {
+		opp-microvolt = <1150000 1150000 1200000>;
+	};
+
+	opp-1992000000 {
+		opp-hz = /bits/ 64 <1992000000>;
+		opp-microvolt = <1200000 1200000 1200000>;
+	};
+};
+
 &cpu1 {
 	cpu-supply = <&vdd_cpu>;
 };
@@ -693,20 +729,5 @@
 	vp0_out_hdmi: endpoint@ROCKCHIP_VOP2_EP_HDMI0 {
 		reg = <ROCKCHIP_VOP2_EP_HDMI0>;
 		remote-endpoint = <&hdmi_in_vp0>;
-	};
-};
-
-&cpu0_opp_table {
-
-	opp-1416000000 {
-		opp-microvolt = <950000 950000 1150000>;
-	};
-
-	opp-1608000000 {
-		opp-microvolt = <1050000 1050000 1150000>;
-	};
-
-	opp-1800000000 {
-		opp-microvolt = <1150000 1150000 1150000>;
 	};
 };
