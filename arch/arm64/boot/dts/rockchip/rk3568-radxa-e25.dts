@@ -4,13 +4,15 @@
 #include "rk3568-radxa-cm3i.dtsi"
 
 / {
-	model = "Radxa E25 Carrier Board";
+	model = "Radxa E25";
 	compatible = "radxa,e25", "radxa,cm3i", "rockchip,rk3568";
 
 	aliases {
-		mmc1 = &sdmmc0;
+		mmc0 = &sdmmc0;
+		mmc1 = &sdhci;
 	};
 
+	/*
 	pwm-leds {
 		compatible = "pwm-leds-multicolor";
 
@@ -32,6 +34,32 @@
 				color = <LED_COLOR_ID_BLUE>;
 				pwms = <&pwm12 0 1000000 0>;
 			};
+		};
+	};
+	*/
+
+	gpio_leds: gpio-leds {
+		led_surround_red: led-surround-red {
+			gpios = <&gpio0 RK_PC0 GPIO_ACTIVE_HIGH>;
+			label = "surround:red";
+			pinctrl-0 = <&led_surround_red_en>;
+			pinctrl-names = "led_surround_red";
+		};
+
+		led_surround_green: led-surround-green {
+			gpios = <&gpio0 RK_PC1 GPIO_ACTIVE_HIGH>;
+			label = "surround:green";
+			linux,default-trigger = "default-on";
+			default-state = "on";
+			pinctrl-0 = <&led_surround_green_en>;
+			pinctrl-names = "led_surround_green";
+		};
+
+		led_surround_blue: led-surround-blue {
+			gpios = <&gpio4 RK_PC5 GPIO_ACTIVE_HIGH>;
+			label = "surround:blue";
+			pinctrl-0 = <&led_surround_blue_en>;
+			pinctrl-names = "led_surround_blue";
 		};
 	};
 
@@ -103,6 +131,12 @@
 	phy-supply = <&vcc3v3_pcie30x1>;
 };
 
+&led_user {
+	linux,default-trigger = "none";
+	default-state = "off";
+};
+
+/* RTL8125 port1 */
 &pcie2x1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie20_reset_h>;
@@ -116,6 +150,7 @@
 	status = "okay";
 };
 
+/* mini pcie */
 &pcie3x1 {
 	num-lanes = <1>;
 	pinctrl-names = "default";
@@ -125,6 +160,7 @@
 	status = "okay";
 };
 
+/* RTL8125 port2 */
 &pcie3x2 {
 	num-lanes = <1>;
 	pinctrl-names = "default";
@@ -135,6 +171,20 @@
 };
 
 &pinctrl {
+	leds {
+		led_surround_red_en: led-surround-red-en {
+			rockchip,pins = <0 RK_PC0 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		led_surround_green_en: led-surround-green-en {
+			rockchip,pins = <0 RK_PC1 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		led_surround_blue_en: led-surround-blue-en {
+			rockchip,pins = <4 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
 	pcie {
 		pcie20_reset_h: pcie20-reset-h {
 			rockchip,pins = <1 RK_PB2 RK_FUNC_GPIO &pcfg_pull_none>;
@@ -169,17 +219,17 @@
 };
 
 &pwm1 {
-	status = "okay";
+	status = "disabled";
 };
 
 &pwm2 {
-	status = "okay";
+	status = "disabled";
 };
 
 &pwm12 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pwm12m1_pins>;
-	status = "okay";
+	status = "disabled";
 };
 
 &sata1 {
