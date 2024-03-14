@@ -157,8 +157,8 @@ static inline bool dev_xmit_complete(int rc)
 
 #if defined(CONFIG_HYPERV_NET)
 # define LL_MAX_HEADER 128
-#elif defined(CONFIG_WLAN) || IS_ENABLED(CONFIG_AX25) || 1
-# if defined(CONFIG_MAC80211_MESH) || 1
+#elif defined(CONFIG_WLAN) || IS_ENABLED(CONFIG_AX25)
+# if defined(CONFIG_MAC80211_MESH)
 #  define LL_MAX_HEADER 128
 # else
 #  define LL_MAX_HEADER 96
@@ -2185,8 +2185,6 @@ struct net_device {
 	struct netdev_hw_addr_list	uc;
 	struct netdev_hw_addr_list	mc;
 	struct netdev_hw_addr_list	dev_addrs;
-
-	unsigned char		local_addr_mask[MAX_ADDR_LEN];
 
 #ifdef CONFIG_SYSFS
 	struct kset		*queues_kset;
