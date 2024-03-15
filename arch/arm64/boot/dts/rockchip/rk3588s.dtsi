@@ -689,11 +689,6 @@
 		status = "disabled";
 	};
 
-	pmu1grf: syscon@fd58a000 {
-		compatible = "rockchip,rk3588-pmugrf", "syscon", "simple-mfd";
-		reg = <0x0 0xfd58a000 0x0 0x10000>;
-	};
-
 	usb_host2_xhci: usb@fcd00000 {
 		compatible = "rockchip,rk3588-dwc3", "snps,dwc3";
 		reg = <0x0 0xfcd00000 0x0 0x400000>;
@@ -713,6 +708,11 @@
 		snps,dis-tx-ipgap-linecheck-quirk;
 		snps,dis_rxdet_inp3_quirk;
 		status = "disabled";
+	};
+
+	pmu1grf: syscon@fd58a000 {
+		compatible = "rockchip,rk3588-pmugrf", "syscon", "simple-mfd";
+		reg = <0x0 0xfd58a000 0x0 0x10000>;
 	};
 
 	sys_grf: syscon@fd58c000 {
