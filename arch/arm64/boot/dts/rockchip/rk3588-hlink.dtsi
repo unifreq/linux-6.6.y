@@ -313,6 +313,7 @@
 
 &gmac0 {
 	status = "okay";
+	label = "eth0";
 	pinctrl-names = "default";
 	pinctrl-0 = <&gmac0_miim
 		     &gmac0_tx_bus2
@@ -471,6 +472,18 @@
 	pinctrl-0 = <&pcie2_1_rst>;
 	reset-gpios = <&gpio4 RK_PA2 GPIO_ACTIVE_HIGH>;
 	status = "okay";
+
+	pcie@0,0 {
+		reg = <0x00300000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		rtl8125_1: pcie-eth@0,0 {
+			compatible = "pci10ec,8125";
+			label = "eth1";
+			reg = <0x000000 0 0 0 0>;
+		};
+	};
 };
 
 &pcie30phy {

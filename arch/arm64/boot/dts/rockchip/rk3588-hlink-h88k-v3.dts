@@ -29,6 +29,18 @@
 	pinctrl-0 = <&pcie2_2_rst>;	
 	reset-gpios = <&gpio4 RK_PA5 GPIO_ACTIVE_HIGH>;
 	status = "okay";
+
+	pcie@0,0 {
+		reg = <0x00400000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+
+		rtl8125_2: pcie-eth@0,0 {
+			compatible = "pci10ec,8125";
+			label = "eth2";
+			reg = <0x000000 0 0 0 0>;
+		};
+	};
 };
 
 &pinctrl {
