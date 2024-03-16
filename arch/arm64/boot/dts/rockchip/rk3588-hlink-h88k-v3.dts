@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+// Copyright (c) 2023 Flippy <flippy@sina.com>
+
+/dts-v1/;
+
+#include "rk3588-hlink.dtsi"
+
+/ {
+	model = "Hlink H88K-V3";
+	compatible = "hlink,h88k", "rockchip,rk3588";
+};
+
+&combphy0_ps {
+	status = "okay";
+};
+
+&gmac0 {
+	phy-mode = "rgmii";
+	tx_delay = <0x42>;
+	rx_delay = <0x34>;
+};
+
+/*
+ * RTL8125B 2.5g ethernet
+ * phy is combphy0_ps
+ */
+&pcie2x1l2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcie2_2_rst>;	
+	reset-gpios = <&gpio4 RK_PA5 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+
+&pinctrl {
+	pcie2 {
+		pcie2_2_rst: pcie2-2-rst {
+			rockchip,pins = <4 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+};
+
+&sdmmc {
+	max-frequency = <200000000>;
+	sd-uhs-sdr104;
+};
