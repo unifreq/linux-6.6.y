@@ -1,0 +1,24 @@
+config USB_R8152_VENDOR
+	tristate "Realtek 8152/8153/8154/8156 USB ethernet support by vendor"
+	depends on USB && NET
+	depends on ! (USB_RTL8152=y || USB_RTL8152=m)
+	select MII
+	select CRC32
+	select CRYPTO
+	select CRYPTO_HASH
+	select CRYPTO_SHA256
+	help
+	  The RTL8152 vendor driver supports the following USB Ethernet chipsets.
+	  RTL8156 / RTL8156B(S)(G): 2.5 GbE (USB 3.0)
+	  RTL8153 / RTL8153B: 10/100/1000 MbE (USB 3.0)
+	  RTL8154 / RTL8154B: 10/100/1000 MbE (USB 2.0)
+	  RTL8152B: 10/100M (USB2.0)
+	  To compile this driver as a module, choose M here: the module
+	  will be called r8152_vendor.  This is recommended.
+
+config USB_R8152_VENDOR_CTAP_SHORT_OFF
+	bool "CTAP Short off"
+	default y
+	depends on USB_R8152_VENDOR
+	help
+	  This enables CONFIG_CTAP_SHORT_OFF flag.

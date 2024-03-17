@@ -111,6 +111,8 @@ config USB_RTL8152
 	  To compile this driver as a module, choose M here: the
 	  module will be called r8152.
 
+source "drivers/net/usb/r8152_vendor/Kconfig"
+
 config USB_LAN78XX
 	tristate "Microchip LAN78XX Based USB Ethernet Adapters"
 	select MII
@@ -637,7 +639,8 @@ config USB_NET_AQC111
 config USB_RTL8153_ECM
 	tristate
 	depends on USB_NET_CDCETHER && (USB_RTL8152 || USB_RTL8152=n)
-	default y
+	depends on !USB_R8152_VENDOR
+	default n
 	help
 	  This option supports ECM mode for RTL8153 ethernet adapter, when
 	  CONFIG_USB_RTL8152 is not set, or the RTL8153 device is not
