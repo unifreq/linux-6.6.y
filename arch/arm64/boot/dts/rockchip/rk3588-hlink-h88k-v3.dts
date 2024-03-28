@@ -46,7 +46,7 @@
 &pinctrl {
 	pcie2 {
 		pcie2_2_rst: pcie2-2-rst {
-			rockchip,pins = <4 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <4 RK_PA5 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
 	};
 };
