@@ -96,6 +96,8 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pcie3_vcc3v3_en>;
 		regulator-name = "vcc3v3_pcie30";
+		regulator-always-on;
+		regulator-boot-on;
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		startup-delay-us = <5000>;
