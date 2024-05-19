@@ -360,21 +360,6 @@
 		compatible = "operating-points-v2";
 		opp-shared;
 
-		opp-408000000 {
-			opp-hz = /bits/ 64 <408000000>;
-			opp-microvolt = <675000 675000 950000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-600000000 {
-			opp-hz = /bits/ 64 <600000000>;
-			opp-microvolt = <675000 675000 950000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-816000000 {
-			opp-hz = /bits/ 64 <816000000>;
-			opp-microvolt = <675000 675000 950000>;
-			clock-latency-ns = <40000>;
-		};
 		opp-1008000000 {
 			opp-hz = /bits/ 64 <1008000000>;
 			opp-microvolt = <675000 675000 950000>;
@@ -407,27 +392,6 @@
 		compatible = "operating-points-v2";
 		opp-shared;
 
-		opp-408000000 {
-			opp-hz = /bits/ 64 <408000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-			opp-suspend;
-		};
-		opp-600000000 {
-			opp-hz = /bits/ 64 <600000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-816000000 {
-			opp-hz = /bits/ 64 <816000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-1008000000 {
-			opp-hz = /bits/ 64 <1008000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-		};
 		opp-1200000000 {
 			opp-hz = /bits/ 64 <1200000000>;
 			opp-microvolt = <675000 675000 1000000>;
@@ -456,21 +420,6 @@
 		opp-2208000000 {
 			opp-hz = /bits/ 64 <2208000000>;
 			opp-microvolt = <987500 987500 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-2256000000 {
-			opp-hz = /bits/ 64 <2256000000>;
-			opp-microvolt = <1000000 1000000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-2304000000 {
-			opp-hz = /bits/ 64 <2304000000>;
-			opp-microvolt = <1000000 1000000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-2352000000 {
-			opp-hz = /bits/ 64 <2352000000>;
-			opp-microvolt = <1000000 1000000 1000000>;
 			clock-latency-ns = <40000>;
 		};
 		opp-2400000000 {
@@ -484,27 +433,6 @@
 		compatible = "operating-points-v2";
 		opp-shared;
 
-		opp-408000000 {
-			opp-hz = /bits/ 64 <408000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-			opp-suspend;
-		};
-		opp-600000000 {
-			opp-hz = /bits/ 64 <600000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-816000000 {
-			opp-hz = /bits/ 64 <816000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-1008000000 {
-			opp-hz = /bits/ 64 <1008000000>;
-			opp-microvolt = <675000 675000 1000000>;
-			clock-latency-ns = <40000>;
-		};
 		opp-1200000000 {
 			opp-hz = /bits/ 64 <1200000000>;
 			opp-microvolt = <675000 675000 1000000>;
@@ -533,21 +461,6 @@
 		opp-2208000000 {
 			opp-hz = /bits/ 64 <2208000000>;
 			opp-microvolt = <987500 987500 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-2256000000 {
-			opp-hz = /bits/ 64 <2256000000>;
-			opp-microvolt = <1000000 1000000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-2304000000 {
-			opp-hz = /bits/ 64 <2304000000>;
-			opp-microvolt = <1000000 1000000 1000000>;
-			clock-latency-ns = <40000>;
-		};
-		opp-2352000000 {
-			opp-hz = /bits/ 64 <2352000000>;
-			opp-microvolt = <1000000 1000000 1000000>;
 			clock-latency-ns = <40000>;
 		};
 		opp-2400000000 {
@@ -2540,16 +2453,7 @@
 			thermal-sensors = <&tsadc 1>;
 
 			trips {
-				/* threshold to start collecting temperature
-				 * statistics e.g. with the IPA governor
-				 */
-				bigcore0_alert0: bigcore0-alert0 {
-					temperature = <75000>;
-					hysteresis = <2000>;
-					type = "passive";
-				};
-				/* actual control temperature */
-				bigcore0_alert1: bigcore0-alert1 {
+				bigcore0_alert: bigcore0-alert {
 					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "passive";
@@ -2562,7 +2466,7 @@
 			};
 			cooling-maps {
 				map0 {
-					trip = <&bigcore0_alert1>;
+					trip = <&bigcore0_alert>;
 					cooling-device =
 						<&cpu_b0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
 						<&cpu_b1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
@@ -2577,16 +2481,7 @@
 			thermal-sensors = <&tsadc 2>;
 
 			trips {
-				/* threshold to start collecting temperature
-				 * statistics e.g. with the IPA governor
-				 */
-				bigcore2_alert0: bigcore2-alert0 {
-					temperature = <75000>;
-					hysteresis = <2000>;
-					type = "passive";
-				};
-				/* actual control temperature */
-				bigcore2_alert1: bigcore2-alert1 {
+				bigcore2_alert: bigcore2-alert {
 					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "passive";
@@ -2599,7 +2494,7 @@
 			};
 			cooling-maps {
 				map0 {
-					trip = <&bigcore2_alert1>;
+					trip = <&bigcore2_alert>;
 					cooling-device =
 						<&cpu_b2 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
 						<&cpu_b3 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
@@ -2614,16 +2509,7 @@
 			thermal-sensors = <&tsadc 3>;
 
 			trips {
-				/* threshold to start collecting temperature
-				 * statistics e.g. with the IPA governor
-				 */
-				littlecore_alert0: littlecore-alert0 {
-					temperature = <75000>;
-					hysteresis = <2000>;
-					type = "passive";
-				};
-				/* actual control temperature */
-				littlecore_alert1: littlecore-alert1 {
+				littlecore_alert: littlecore-alert {
 					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "passive";
@@ -2636,7 +2522,7 @@
 			};
 			cooling-maps {
 				map0 {
-					trip = <&littlecore_alert1>;
+					trip = <&littlecore_alert>;
 					cooling-device =
 						<&cpu_l0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
 						<&cpu_l1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
