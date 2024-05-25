@@ -49,19 +49,20 @@
 			default-state = "on";
 		};
 
-		net_led {
-			led_name = "net_led";
-			gpios = <&gpio_ao GPIOAO_9 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-			linux,default-trigger = "0.0:00:link";
-		};
-
-		remote_led {
-			led_name = "remote_led";
+		green_led {
+			led_name = "green_led";
 			gpios = <&gpio_ao GPIOAO_10 GPIO_ACTIVE_LOW>;
 			default-state = "off";
-			linux,default-trigger = "rc-feedback";
+			linux,default-trigger = "heartbeat";
 		};
+	/*
+	 *	remote_led {
+	 *		led_name = "remote_led";
+	 *		gpios = <&gpio_ao GPIOAO_10 GPIO_ACTIVE_LOW>;
+	 *		default-state = "off";
+	 *		linux,default-trigger = "rc-feedback";
+	 *	};
+	 */
 	};
 
 	memory@0 {
@@ -169,5 +170,13 @@
 	/delete-property/ reset-names;
 	phy-handle = <&internal_ephy>;
 	phy-mode = "rmii";
+	status = "okay";
+};
+
+&pwm_ef {
+	pinctrl-0 = <&pwm_e_pins>;
+	pinctrl-names = "default";
+	clocks = <&xtal>;
+	clock-names = "clkin0";
 	status = "okay";
 };
