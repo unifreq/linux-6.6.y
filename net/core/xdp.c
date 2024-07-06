@@ -294,8 +294,10 @@ static struct xdp_mem_allocator *__xdp_reg_mem_model(struct xdp_mem_info *mem,
 		mutex_lock(&mem_id_lock);
 		ret = __mem_id_init_hash_table();
 		mutex_unlock(&mem_id_lock);
-		if (ret < 0)
+		if (ret < 0) {
+			WARN_ON(1);
 			return ERR_PTR(ret);
+		}
 	}
 
 	xdp_alloc = kzalloc(sizeof(*xdp_alloc), gfp);

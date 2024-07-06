@@ -610,15 +610,15 @@ int sas_ata_init(struct domain_device *found_dev)
 
 	rc = ata_sas_tport_add(ata_host->dev, ap);
 	if (rc)
-		goto free_port;
+		goto destroy_port;
 
 	found_dev->sata_dev.ata_host = ata_host;
 	found_dev->sata_dev.ap = ap;
 
 	return 0;
 
-free_port:
-	ata_port_free(ap);
+destroy_port:
+	kfree(ap);
 free_host:
 	ata_host_put(ata_host);
 	return rc;

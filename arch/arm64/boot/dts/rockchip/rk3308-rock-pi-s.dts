@@ -5,8 +5,6 @@
  */
 
 /dts-v1/;
-
-#include <dt-bindings/leds/common.h>
 #include "rk3308.dtsi"
 
 / {
@@ -26,21 +24,17 @@
 	leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
-		pinctrl-0 = <&green_led>, <&heartbeat_led>;
+		pinctrl-0 = <&green_led_gio>, <&heartbeat_led_gpio>;
 
 		green-led {
-			color = <LED_COLOR_ID_GREEN>;
 			default-state = "on";
-			function = LED_FUNCTION_POWER;
 			gpios = <&gpio0 RK_PA6 GPIO_ACTIVE_HIGH>;
 			label = "rockpis:green:power";
 			linux,default-trigger = "default-on";
 		};
 
 		blue-led {
-			color = <LED_COLOR_ID_BLUE>;
 			default-state = "on";
-			function = LED_FUNCTION_HEARTBEAT;
 			gpios = <&gpio0 RK_PA5 GPIO_ACTIVE_HIGH>;
 			label = "rockpis:blue:user";
 			linux,default-trigger = "heartbeat";
@@ -132,12 +126,10 @@
 };
 
 &emmc {
+	bus-width = <4>;
 	cap-mmc-highspeed;
-	cap-sd-highspeed;
-	no-sdio;
+	mmc-hs200-1_8v;
 	non-removable;
-	pinctrl-names = "default";
-	pinctrl-0 = <&emmc_bus8 &emmc_clk &emmc_cmd>;
 	vmmc-supply = <&vcc_io>;
 	status = "okay";
 };
@@ -222,11 +214,11 @@
 	pinctrl-0 = <&rtc_32k>;
 
 	leds {
-		green_led: green-led {
+		green_led_gio: green-led-gpio {
 			rockchip,pins = <0 RK_PA6 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 
-		heartbeat_led: heartbeat-led {
+		heartbeat_led_gpio: heartbeat-led-gpio {
 			rockchip,pins = <0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
