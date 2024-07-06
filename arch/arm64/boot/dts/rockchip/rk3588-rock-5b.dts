@@ -284,7 +284,7 @@
 	status = "okay";
 };
 
-/* rtl8125b eth0 */
+/* rtl8125b */
 &pcie2x1l2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie2_2_rst>;
@@ -299,7 +299,6 @@
 
 		rtl8125: pcie-eth@0,0 {
 			compatible = "pci10ec,8125";
-			label = "eth0";
 			reg = <0x000000 0 0 0 0>;
 
 			/* G+: LED0
