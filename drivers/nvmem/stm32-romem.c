@@ -10,9 +10,7 @@
 #include <linux/io.h>
 #include <linux/module.h>
 #include <linux/nvmem-provider.h>
-#include <linux/of.h>
-#include <linux/platform_device.h>
-#include <linux/property.h>
+#include <linux/of_device.h>
 #include <linux/tee_drv.h>
 
 #include "stm32-bsec-optee-ta.h"
@@ -213,7 +211,8 @@ static int stm32_romem_probe(struct platform_device *pdev)
 
 	priv->lower = 0;
 
-	cfg = device_get_match_data(dev);
+	cfg = (const struct stm32_romem_cfg *)
+		of_match_device(dev->driver->of_match_table, dev)->data;
 	if (!cfg) {
 		priv->cfg.read_only = true;
 		priv->cfg.size = resource_size(res);
@@ -269,19 +268,6 @@ static const struct stm32_romem_cfg stm32mp13_bsec_cfg = {
 	.ta = true,
 };
 
-/*
- * STM32MP25 BSEC OTP: 3 regions of 32-bits data words
- *   lower OTP (OTP0 to OTP127), bitwise (1-bit) programmable
- *   mid OTP (OTP128 to OTP255), bulk (32-bit) programmable
- *   upper OTP (OTP256 to OTP383), bulk (32-bit) programmable
- *              but no access to HWKEY and ECIES key: limited at OTP367
- */
-static const struct stm32_romem_cfg stm32mp25_bsec_cfg = {
-	.size = 368 * 4,
-	.lower = 127,
-	.ta = true,
-};
-
 static const struct of_device_id stm32_romem_of_match[] __maybe_unused = {
 	{ .compatible = "st,stm32f4-otp", }, {
 		.compatible = "st,stm32mp15-bsec",
@@ -289,9 +275,6 @@ static const struct of_device_id stm32_romem_of_match[] __maybe_unused = {
 	}, {
 		.compatible = "st,stm32mp13-bsec",
 		.data = (void *)&stm32mp13_bsec_cfg,
-	}, {
-		.compatible = "st,stm32mp25-bsec",
-		.data = (void *)&stm32mp25_bsec_cfg,
 	},
 	{ /* sentinel */ },
 };

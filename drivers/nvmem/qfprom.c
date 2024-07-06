@@ -424,12 +424,12 @@ static int qfprom_probe(struct platform_device *pdev)
 		if (IS_ERR(priv->vcc))
 			return PTR_ERR(priv->vcc);
 
-		priv->secclk = devm_clk_get_optional(dev, "core");
+		priv->secclk = devm_clk_get(dev, "core");
 		if (IS_ERR(priv->secclk))
 			return dev_err_probe(dev, PTR_ERR(priv->secclk), "Error getting clock\n");
 
-		/* Only enable writing if we have SoC data and a valid clock */
-		if (priv->soc_data && priv->secclk)
+		/* Only enable writing if we have SoC data. */
+		if (priv->soc_data)
 			econfig.reg_write = qfprom_reg_write;
 	}
 

@@ -131,7 +131,6 @@ struct packet_sock {
 	struct net_device __rcu	*cached_dev;
 	struct packet_type	prot_hook ____cacheline_aligned_in_smp;
 	atomic_t		tp_drops ____cacheline_aligned_in_smp;
-	unsigned int		pkt_type;
 };
 
 #define pkt_sk(ptr) container_of_const(ptr, struct packet_sock, sk)
