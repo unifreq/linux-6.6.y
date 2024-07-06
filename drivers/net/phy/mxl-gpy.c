@@ -10,6 +10,7 @@
 #include <linux/bitfield.h>
 #include <linux/hwmon.h>
 #include <linux/mutex.h>
+#include <linux/of.h>
 #include <linux/phy.h>
 #include <linux/polynomial.h>
 #include <linux/property.h>
@@ -38,6 +39,7 @@
 #define PHY_MIISTAT		0x18	/* MII state */
 #define PHY_IMASK		0x19	/* interrupt mask */
 #define PHY_ISTAT		0x1A	/* interrupt status */
+#define PHY_LED			0x1B	/* LED control */
 #define PHY_FWV			0x1E	/* firmware version */
 
 #define PHY_MIISTAT_SPD_MASK	GENMASK(2, 0)
@@ -61,9 +63,14 @@
 				 PHY_IMASK_ADSC | \
 				 PHY_IMASK_ANC)
 
+#define PHY_LED_NUM_LEDS	4
+
 #define PHY_FWV_REL_MASK	BIT(15)
 #define PHY_FWV_MAJOR_MASK	GENMASK(11, 8)
 #define PHY_FWV_MINOR_MASK	GENMASK(7, 0)
+
+/* LED */
+#define VSPEC1_LED(x)		(0x1 + x)
 
 #define PHY_PMA_MGBT_POLARITY	0x82
 #define PHY_MDI_MDI_X_MASK	GENMASK(1, 0)
@@ -270,10 +277,39 @@ out:
 	return ret;
 }
 
+static int gpy_led_write(struct phy_device *phydev)
+{
+	struct device_node *node = phydev->mdio.dev.of_node;
+	u32 led_regs[PHY_LED_NUM_LEDS];
+	int i, ret;
+	u16 val = 0xff00;
+
+	if (!IS_ENABLED(CONFIG_OF_MDIO))
+		return 0;
+
+	if (of_property_read_u32_array(node, "mxl,led-config", led_regs, PHY_LED_NUM_LEDS))
+		return 0;
+
+	if (of_property_read_bool(node, "mxl,led-drive-vdd"))
+		val &= 0x0fff;
+
+	/* Enable LED function handling on all ports*/
+	phy_write(phydev, PHY_LED, val);
+
+	/* Write LED register values */
+	for (i = 0; i < PHY_LED_NUM_LEDS; i++) {
+		ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, VSPEC1_LED(i), (u16)led_regs[i]);
+		if (ret < 0)
+			return ret;
+	}
+
+	return 0;
+}
+
 static int gpy_config_init(struct phy_device *phydev)
 {
 	/* Nothing to configure. Configuration Requirement Placeholder */
-	return 0;
+	return gpy_led_write(phydev);
 }
 
 static int gpy_probe(struct phy_device *phydev)

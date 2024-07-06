@@ -17,6 +17,10 @@ if BCMA
 config BCMA_BLOCKIO
 	bool
 
+config BCMA_FALLBACK_SPROM
+	bool
+	default y
+
 config BCMA_HOST_PCI_POSSIBLE
 	bool
 	depends on PCI = y
