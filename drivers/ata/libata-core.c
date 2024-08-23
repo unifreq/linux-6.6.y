@@ -685,6 +685,17 @@ static inline void ata_set_tf_cdl(struct ata_queued_cmd *qc, int cdl)
 	qc->flags |= ATA_QCFLAG_HAS_CDL | ATA_QCFLAG_RESULT_TF;
 }
 
+#ifdef CONFIG_ATA_LEDS
+#define LIBATA_BLINK_DELAY 20 /* ms */
+static inline void ata_led_act(struct ata_port *ap)
+{
+	if (unlikely(!ap->ledtrig))
+		return;
+
+	led_trigger_blink_oneshot(ap->ledtrig, LIBATA_BLINK_DELAY, LIBATA_BLINK_DELAY, 0);
+}
+#endif
+
 /**
  *	ata_build_rw_tf - Build ATA taskfile for given read/write request
  *	@qc: Metadata associated with the taskfile to build
@@ -4771,6 +4782,9 @@ void __ata_qc_complete(struct ata_queued_cmd *qc)
 		link->active_tag = ATA_TAG_POISON;
 		ap->nr_active_links--;
 	}
+#ifdef CONFIG_ATA_LEDS
+	ata_led_act(ap);
+#endif
 
 	/* clear exclusive status */
 	if (unlikely(qc->flags & ATA_QCFLAG_CLEAR_EXCL &&
@@ -5494,6 +5508,9 @@ struct ata_port *ata_port_alloc(struct ata_host *host)
 	ap->stats.unhandled_irq = 1;
 	ap->stats.idle_irq = 1;
 #endif
+#ifdef CONFIG_ATA_LEDS
+	ap->ledtrig = kzalloc(sizeof(struct led_trigger), GFP_KERNEL);
+#endif
 	ata_sff_port_init(ap);
 
 	return ap;
@@ -5507,6 +5524,12 @@ void ata_port_free(struct ata_port *ap)
 	kfree(ap->pmp_link);
 	kfree(ap->slave_link);
 	kfree(ap->ncq_sense_buf);
+#ifdef CONFIG_ATA_LEDS
+	if (ap->ledtrig) {
+		led_trigger_unregister(ap->ledtrig);
+		kfree(ap->ledtrig);
+	};
+#endif
 	kfree(ap);
 }
 EXPORT_SYMBOL_GPL(ata_port_free);
@@ -5927,7 +5950,23 @@ int ata_host_register(struct ata_host *host, const struct scsi_host_template *sh
 		host->ports[i]->print_id = atomic_inc_return(&ata_print_id);
 		host->ports[i]->local_port_no = i + 1;
 	}
+#ifdef CONFIG_ATA_LEDS
+	for (i = 0; i < host->n_ports; i++) {
+		if (unlikely(!host->ports[i]->ledtrig))
+			continue;
 
+		snprintf(host->ports[i]->ledtrig_name,
+			sizeof(host->ports[i]->ledtrig_name), "ata%u",
+			host->ports[i]->print_id);
+
+		host->ports[i]->ledtrig->name = host->ports[i]->ledtrig_name;
+
+		if (led_trigger_register(host->ports[i]->ledtrig)) {
+			kfree(host->ports[i]->ledtrig);
+			host->ports[i]->ledtrig = NULL;
+		}
+	}
+#endif
 	/* Create associated sysfs transport objects  */
 	for (i = 0; i < host->n_ports; i++) {
 		rc = ata_tport_add(host->dev,host->ports[i]);
