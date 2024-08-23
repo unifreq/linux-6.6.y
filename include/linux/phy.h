@@ -605,8 +605,6 @@ struct macsec_ops;
  * @irq_rerun: Flag indicating interrupts occurred while PHY was suspended,
  *             requiring a rerun of the interrupt handler after resume
  * @interface: enum phy_interface_t value
- * @possible_interfaces: bitmap if interface modes that the attached PHY
- *			 will switch between depending on media speed.
  * @skb: Netlink message for cable diagnostics
  * @nest: Netlink nest used for cable diagnostics
  * @ehdr: nNtlink header for cable diagnostics
@@ -676,7 +674,6 @@ struct phy_device {
 	u32 dev_flags;
 
 	phy_interface_t interface;
-	DECLARE_PHY_INTERFACE_MASK(possible_interfaces);
 
 	/*
 	 * forced speed & duplex (no autoneg)
@@ -869,15 +866,6 @@ struct phy_led {
 
 #define to_phy_led(d) container_of(d, struct phy_led, led_cdev)
 
-/* Modes for PHY LED configuration */
-enum phy_led_modes {
-	PHY_LED_ACTIVE_LOW = 0,
-	PHY_LED_INACTIVE_HIGH_IMPEDANCE = 1,
-
-	/* keep it last */
-	__PHY_LED_MODES_NUM,
-};
-
 /**
  * struct phy_driver - Driver structure for a particular PHY type
  *
@@ -974,12 +962,6 @@ struct phy_driver {
 
 	/** @handle_interrupt: Override default interrupt handling */
 	irqreturn_t (*handle_interrupt)(struct phy_device *phydev);
-
-	/*
-	 * Called before an ethernet device is detached
-	 * from the PHY.
-	 */
-	void (*detach)(struct phy_device *phydev);
 
 	/** @remove: Clears up any memory if needed */
 	void (*remove)(struct phy_device *phydev);
@@ -1160,19 +1142,6 @@ struct phy_driver {
 	int (*led_hw_control_get)(struct phy_device *dev, u8 index,
 				  unsigned long *rules);
 
-	/**
-	 * @led_polarity_set: Set the LED polarity modes
-	 * @dev: PHY device which has the LED
-	 * @index: Which LED of the PHY device
-	 * @modes: bitmap of LED polarity modes
-	 *
-	 * Configure LED with all the required polarity modes in @modes
-	 * to make it correctly turn ON or OFF.
-	 *
-	 * Returns 0, or an error code.
-	 */
-	int (*led_polarity_set)(struct phy_device *dev, int index,
-				unsigned long modes);
 };
 #define to_phy_driver(d) container_of(to_mdio_common_driver(d),		\
 				      struct phy_driver, mdiodrv)
