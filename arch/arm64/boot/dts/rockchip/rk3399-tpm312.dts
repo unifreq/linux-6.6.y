@@ -728,7 +728,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdmmc_clk &sdmmc_cmd &sdmmc_cd &sdmmc_bus4>;
 	card-detect-delay = <800>;
-	status = "okay";
+	status = "disabled";
 };
 
 &sdhci {
@@ -742,7 +742,7 @@
 };
 
 &spi1 {
-	status = "okay";
+    status = "okay";
     //max-freq = <48000000>
     spi_wk2xxx@0 {
         status = "okay";
@@ -752,7 +752,7 @@
         poll_mode = <0x00>;
         type = <0x00>;
         enable_dma = <0x00>;
-        irq_gpio = <&gpio3 RK_PD4 4>;
+        irq-gpio = <&gpio3 RK_PD4 4>;
         pinctrl-names = "default";
         pinctrl-0 = <&wk2_irq>;
     };
@@ -875,7 +875,7 @@
     status="disabled";
 };
 &gpu{
-	mali-supply = <&vdd_gpu>;
+    mali-supply = <&vdd_gpu>;
     ower-off-delay-ms = <200>;
     status = "okay";
 };
@@ -903,7 +903,7 @@
 	};
 	gprs_rst {
 		gpio-hog;
-		gpios = <4 1>;
+		gpios = <4 0>;
 		output-low;
 	};
 };
@@ -911,7 +911,7 @@
 &gpio2 {
 	wk2_rst {
 		gpio-hog;
-		gpios = <0x12 0x01>;
+		gpios = <18 0>;
 		output-low;
 	};
 };
@@ -919,22 +919,22 @@
 &gpio4 {
 	usb1_en {
 		gpio-hog;
-		gpios = <0x1c 0x00>;
+		gpios = <28 0>;
 		output-high;
 	};
 	usb3_en {
 		gpio-hog;
-		gpios = <0x1e 0x00>;
+		gpios = <30 0>;
 		output-high;
 	};
 	usb4_en {
 		gpio-hog;
-		gpios = <0x15 0x00>;
+		gpios = <21 0>;
 		output-high;
 	};
 	usb5_en {
 		gpio-hog;
-		gpios = <0x18 0x00>;
+		gpios = <24 0>;
 		output-high;
 	};
 };
