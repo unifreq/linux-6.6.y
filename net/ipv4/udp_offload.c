@@ -282,12 +282,6 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
 		     skb_transport_header(gso_skb)))
 		return ERR_PTR(-EINVAL);
 
-	/* We don't know if egress device can segment and checksum the packet
-	 * when IPv6 extension headers are present. Fall back to software GSO.
-	 */
-	if (gso_skb->ip_summed != CHECKSUM_PARTIAL)
-		features &= ~(NETIF_F_GSO_UDP_L4 | NETIF_F_CSUM_MASK);
-
 	if (skb_gso_ok(gso_skb, features | NETIF_F_GSO_ROBUST)) {
 		/* Packet is from an untrusted source, reset gso_segs. */
 		skb_shinfo(gso_skb)->gso_segs = DIV_ROUND_UP(gso_skb->len - sizeof(*uh),
@@ -295,16 +289,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
 		return NULL;
 	}
 
-	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
-		 /* Detect modified geometry and pass these to skb_segment. */
-		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
-			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
-
-		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
-		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
-		gso_skb->csum_offset = offsetof(struct udphdr, check);
-		gso_skb->ip_summed = CHECKSUM_PARTIAL;
-	}
+	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
+		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
 
 	skb_pull(gso_skb, sizeof(*uh));
 
@@ -374,14 +360,6 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
 		gso_reset_checksum(seg, ~check);
 	else
 		uh->check = gso_make_checksum(seg, ~check) ? : CSUM_MANGLED_0;
-
-	/* On the TX path, CHECKSUM_NONE and CHECKSUM_UNNECESSARY have the same
-	 * meaning. However, check for bad offloads in the GSO stack expects the
-	 * latter, if the checksum was calculated in software. To vouch for the
-	 * segment skbs we actually need to set it on the gso_skb.
-	 */
-	if (gso_skb->ip_summed == CHECKSUM_NONE)
-		gso_skb->ip_summed = CHECKSUM_UNNECESSARY;
 
 	/* update refcount for the packet */
 	if (copy_dtor) {
@@ -457,6 +435,33 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
 	segs = skb_segment(skb, features);
 out:
 	return segs;
+}
+
+static int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
+{
+	if (unlikely(p->len + skb->len >= 65536))
+		return -E2BIG;
+
+	if (NAPI_GRO_CB(p)->last == p)
+		skb_shinfo(p)->frag_list = skb;
+	else
+		NAPI_GRO_CB(p)->last->next = skb;
+
+	skb_pull(skb, skb_gro_offset(skb));
+
+	NAPI_GRO_CB(p)->last = skb;
+	NAPI_GRO_CB(p)->count++;
+	p->data_len += skb->len;
+
+	/* sk ownership - if any - completely transferred to the aggregated packet */
+	skb->destructor = NULL;
+	skb->sk = NULL;
+	p->truesize += skb->truesize;
+	p->len += skb->len;
+
+	NAPI_GRO_CB(skb)->same_flow = 1;
+
+	return 0;
 }
 
 
