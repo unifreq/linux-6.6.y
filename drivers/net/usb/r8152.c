@@ -11,7 +11,6 @@
 #include <linux/mii.h>
 #include <linux/ethtool.h>
 #include <linux/usb.h>
-#include <linux/of.h>
 #include <linux/crc32.h>
 #include <linux/if_vlan.h>
 #include <linux/uaccess.h>
@@ -2585,9 +2584,8 @@ static int rx_bottom(struct r8152 *tp, int budget)
 		while (urb->actual_length > len_used) {
 			struct net_device *netdev = tp->netdev;
 			struct net_device_stats *stats = &netdev->stats;
-			unsigned int pkt_len, rx_frag_head_sz, len;
+			unsigned int pkt_len, rx_frag_head_sz;
 			struct sk_buff *skb;
-			bool use_frags;
 
 			WARN_ON_ONCE(skb_queue_len(&tp->rx_queue) >= 1000);
 
@@ -2600,77 +2598,45 @@ static int rx_bottom(struct r8152 *tp, int budget)
 				break;
 
 			pkt_len -= ETH_FCS_LEN;
-			len = pkt_len;
 			rx_data += sizeof(struct rx_desc);
 
-			if (!agg_free || tp->rx_copybreak > len)
-				use_frags = false;
+			if (!agg_free || tp->rx_copybreak > pkt_len)
+				rx_frag_head_sz = pkt_len;
 			else
-				use_frags = true;
+				rx_frag_head_sz = tp->rx_copybreak;
 
-			if (use_frags) {
-				/* If the budget is exhausted, the packet
-				 * would be queued in the driver. That is,
-				 * napi_gro_frags() wouldn't be called, so
-				 * we couldn't use napi_get_frags().
-				 */
-				if (work_done >= budget) {
-					rx_frag_head_sz = tp->rx_copybreak;
-					skb = napi_alloc_skb(napi,
-							     rx_frag_head_sz);
-				} else {
-					rx_frag_head_sz = 0;
-					skb = napi_get_frags(napi);
-				}
-			} else {
-				rx_frag_head_sz = 0;
-				skb = napi_alloc_skb(napi, len);
-			}
-
+			skb = napi_alloc_skb(napi, rx_frag_head_sz);
 			if (!skb) {
 				stats->rx_dropped++;
 				goto find_next_rx;
 			}
 
 			skb->ip_summed = r8152_rx_csum(tp, rx_desc);
-			rtl_rx_vlan_tag(rx_desc, skb);
-
-			if (use_frags) {
-				if (rx_frag_head_sz) {
-					memcpy(skb->data, rx_data,
-					       rx_frag_head_sz);
-					skb_put(skb, rx_frag_head_sz);
-					len -= rx_frag_head_sz;
-					rx_data += rx_frag_head_sz;
-					skb->protocol = eth_type_trans(skb,
-								       netdev);
-				}
-
+			memcpy(skb->data, rx_data, rx_frag_head_sz);
+			skb_put(skb, rx_frag_head_sz);
+			pkt_len -= rx_frag_head_sz;
+			rx_data += rx_frag_head_sz;
+			if (pkt_len) {
 				skb_add_rx_frag(skb, 0, agg->page,
 						agg_offset(agg, rx_data),
-						len, SKB_DATA_ALIGN(len));
+						pkt_len,
+						SKB_DATA_ALIGN(pkt_len));
 				get_page(agg->page);
-			} else {
-				memcpy(skb->data, rx_data, len);
-				skb_put(skb, len);
-				skb->protocol = eth_type_trans(skb, netdev);
 			}
 
+			skb->protocol = eth_type_trans(skb, netdev);
+			rtl_rx_vlan_tag(rx_desc, skb);
 			if (work_done < budget) {
-				if (use_frags)
-					napi_gro_frags(napi);
-				else
-					napi_gro_receive(napi, skb);
-
 				work_done++;
 				stats->rx_packets++;
-				stats->rx_bytes += pkt_len;
+				stats->rx_bytes += skb->len;
+				napi_gro_receive(napi, skb);
 			} else {
 				__skb_queue_tail(&tp->rx_queue, skb);
 			}
 
 find_next_rx:
-			rx_data = rx_agg_align(rx_data + len + ETH_FCS_LEN);
+			rx_data = rx_agg_align(rx_data + pkt_len + ETH_FCS_LEN);
 			rx_desc = (struct rx_desc *)rx_data;
 			len_used = agg_offset(agg, rx_data);
 			len_used += sizeof(struct rx_desc);
@@ -7045,22 +7011,6 @@ static void rtl_tally_reset(struct r8152 *tp)
 	ocp_write_word(tp, MCU_TYPE_PLA, PLA_RSTTALLY, ocp_data);
 }
 
-static int r8152_led_configuration(struct r8152 *tp)
-{
-	u32 led_data;
-	int ret;
-
-	ret = of_property_read_u32(tp->udev->dev.of_node, "realtek,led-data",
-								&led_data);
-
-	if (ret)
-		return ret;
-
-	ocp_write_word(tp, MCU_TYPE_PLA, PLA_LEDSEL, led_data);
-
-	return 0;
-}
-
 static void r8152b_init(struct r8152 *tp)
 {
 	u32 ocp_data;
@@ -7102,8 +7052,6 @@ static void r8152b_init(struct r8152 *tp)
 	ocp_data = ocp_read_word(tp, MCU_TYPE_USB, USB_USB_CTRL);
 	ocp_data &= ~(RX_AGG_DISABLE | RX_ZERO_EN);
 	ocp_write_word(tp, MCU_TYPE_USB, USB_USB_CTRL, ocp_data);
-
-	r8152_led_configuration(tp);
 }
 
 static void r8153_init(struct r8152 *tp)
@@ -7244,8 +7192,6 @@ static void r8153_init(struct r8152 *tp)
 		tp->coalesce = COALESCE_SLOW;
 		break;
 	}
-
-	r8152_led_configuration(tp);
 }
 
 static void r8153b_init(struct r8152 *tp)
@@ -7328,8 +7274,6 @@ static void r8153b_init(struct r8152 *tp)
 	rtl_tally_reset(tp);
 
 	tp->coalesce = 15000;	/* 15 us */
-
-	r8152_led_configuration(tp);
 }
 
 static void r8153c_init(struct r8152 *tp)

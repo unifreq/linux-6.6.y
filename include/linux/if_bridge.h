@@ -61,7 +61,6 @@ struct br_ip_list {
 #define BR_PORT_LOCKED		BIT(21)
 #define BR_PORT_MAB		BIT(22)
 #define BR_NEIGH_VLAN_SUPPRESS	BIT(23)
-#define BR_BPDU_FILTER		BIT(24)
 
 #define BR_DEFAULT_AGEING_TIME	(300 * HZ)
 
@@ -71,9 +70,6 @@ void brioctl_set(int (*hook)(struct net *net, struct net_bridge *br,
 			     void __user *uarg));
 int br_ioctl_call(struct net *net, struct net_bridge *br, unsigned int cmd,
 		  struct ifreq *ifr, void __user *uarg);
-
-extern void br_dev_update_stats(struct net_device *dev,
-				struct rtnl_link_stats64 *nlstats);
 
 #if IS_ENABLED(CONFIG_BRIDGE) && IS_ENABLED(CONFIG_BRIDGE_IGMP_SNOOPING)
 int br_multicast_list_adjacent(struct net_device *dev,
