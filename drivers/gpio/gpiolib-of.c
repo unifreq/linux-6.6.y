@@ -1193,7 +1193,6 @@ static int of_gpio_export_probe(struct platform_device *pdev)
 static struct platform_driver gpio_export_driver = {
 	.driver		= {
 		.name		= "gpio-export",
-		.owner	= THIS_MODULE,
 		.of_match_table	= of_match_ptr(gpio_export_ids),
 	},
 	.probe		= of_gpio_export_probe,

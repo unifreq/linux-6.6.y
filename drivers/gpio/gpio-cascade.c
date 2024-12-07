@@ -36,11 +36,6 @@ struct gpio_cascade {
 	struct gpio_desc	*upstream_line;
 };
 
-static struct gpio_cascade *chip_to_cascade(struct gpio_chip *gc)
-{
-	return container_of(gc, struct gpio_cascade, gpio_chip);
-}
-
 static int gpio_cascade_get_direction(struct gpio_chip *gc, unsigned int offset)
 {
 	return GPIO_LINE_DIRECTION_IN;
@@ -48,7 +43,7 @@ static int gpio_cascade_get_direction(struct gpio_chip *gc, unsigned int offset)
 
 static int gpio_cascade_get_value(struct gpio_chip *gc, unsigned int offset)
 {
-	struct gpio_cascade *cas = chip_to_cascade(gc);
+	struct gpio_cascade *cas = gpiochip_get_data(gc);
 	int ret;
 
 	ret = mux_control_select(cas->mux_control, offset);
@@ -94,7 +89,7 @@ static int gpio_cascade_probe(struct platform_device *pdev)
 	gc->owner = THIS_MODULE;
 
 	platform_set_drvdata(pdev, cas);
-	return devm_gpiochip_add_data(dev, &cas->gpio_chip, NULL);
+	return devm_gpiochip_add_data(dev, &cas->gpio_chip, cas);
 }
 
 static const struct of_device_id gpio_cascade_id[] = {
