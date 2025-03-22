@@ -18,6 +18,11 @@
 	aliases {
 		mmc0 = &sdhci;
 		mmc1 = &sdmmc;
+		/*
+		 * The rk808 circuit design on this board does not have the ability to maintain real-time time after a power outage.
+		 * Registering rk808 as rtc99 (most kernel configurations read time from rtc0) can prevent the kernel from reading the time (2013) from rk808 during startup.
+		 */
+		rtc99 = &rk808;
 	};
 
 	chosen {
@@ -174,6 +179,8 @@
 
 	virtual_pd: virtual-pd {
 		compatible = "linux,extcon-usbc-virtual-pd";
+		pinctrl-names = "default";
+		pinctrl-0 = <&dp_hpd>;
 		det-gpios = <&gpio4 RK_PD1 GPIO_ACTIVE_LOW>;
 		vpd-data-role = "display-port";
 		vpd-super-speed;
@@ -527,7 +534,7 @@
 	};
 
 	display {
-		dp-hpd {
+		dp_hpd: dp-hpd {
 			rockchip,pins = <4 RK_PD1 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 
