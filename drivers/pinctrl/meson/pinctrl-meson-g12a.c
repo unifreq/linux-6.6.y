@@ -283,6 +283,7 @@ static const unsigned int pwm_c_z_pins[]		= { GPIOZ_1 };
 static const unsigned int pwm_d_x3_pins[]		= { GPIOX_3 };
 static const unsigned int pwm_d_x6_pins[]		= { GPIOX_6 };
 static const unsigned int pwm_d_z_pins[]		= { GPIOZ_2 };
+static const unsigned int pwm_d_a_pins[]		= { GPIOA_4 };
 
 /* pwm_e */
 static const unsigned int pwm_e_pins[]			= { GPIOX_16 };
@@ -598,6 +599,7 @@ static struct meson_pmx_group meson_g12a_periphs_groups[] = {
 	GROUP(pwm_b_z,			5),
 	GROUP(pwm_c_z,			5),
 	GROUP(pwm_d_z,			2),
+	GROUP(pwm_d_a,			3),
 	GROUP(tsin_b_valid_z,		3),
 	GROUP(tsin_b_sop_z,		3),
 	GROUP(tsin_b_din0_z,		3),
@@ -1074,7 +1076,7 @@ static const char * const pwm_c_groups[] = {
 };
 
 static const char * const pwm_d_groups[] = {
-	"pwm_d_x3", "pwm_d_x6", "pwm_d_z",
+	"pwm_d_x3", "pwm_d_x6", "pwm_d_z", "pwm_d_a",
 };
 
 static const char * const pwm_e_groups[] = {

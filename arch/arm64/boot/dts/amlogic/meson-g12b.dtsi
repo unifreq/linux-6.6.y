@@ -182,4 +182,12 @@
 			bias-disable;
 		};
 	};
+
+	pwm_d_a_pins: pwm-d-a {
+		mux {
+			groups = "pwm_d_a";
+			function = "pwm_d";
+			bias-disable;
+		};
+	};
 };
