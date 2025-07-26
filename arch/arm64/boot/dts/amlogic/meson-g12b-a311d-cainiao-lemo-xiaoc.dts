@@ -199,6 +199,16 @@
 		vin-supply = <&vcc_5v>;
 	};
 
+	vcc_5v_typec: regulator-vcc-5v-typec {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&gpio GPIOA_11 GPIO_ACTIVE_HIGH>;
+		regulator-name = "vcc_5v_typec";
+		regulator-always-on;
+		regulator-boot-on;
+		vin-supply = <&vcc_5v>;
+	};
+
 	vdd_amp: regulator-vdd-amp {
 		compatible = "regulator-fixed";
 		regulator-name = "vdd_amp";
