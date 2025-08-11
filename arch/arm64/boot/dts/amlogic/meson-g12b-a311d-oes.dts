@@ -25,6 +25,7 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+		kaslr-seed = <0xfeedbeef 0xc0def00d>;
 	};
 
 	memory@0 {
@@ -49,9 +50,9 @@
 			gpios = <&gpio GPIOH_4 GPIO_ACTIVE_LOW>;
 		};
 
-		rec-btn {
-			label = "rec-btn";
-			linux,code = <KEY_VENDOR>;
+		rst-btn {
+			label = "rst-btn";
+			linux,code = <KEY_RESTART>;
 			gpios = <&gpio GPIOA_0 GPIO_ACTIVE_LOW>;
 		};
 	};
@@ -101,16 +102,12 @@
 			linux,default-trigger = "mdio_mux-0.0:00:link";
 		};
 
-		/*
-		 * Currently, it is not possible to bind each LED's trigger to a specific SATA hard drive in the kernel.
-		 * Instead, in user space, SATA hard drives can be detected and LEDs controlled through udev rules or scripts.
-		 */
 		sata1-led-green {
 			function = LED_FUNCTION_DISK;
 			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&gpio GPIOA_14 GPIO_ACTIVE_LOW>;
 			default-state = "off";
-			/* linux,default-trigger = "ata1"; */
+			linux,default-trigger = "ata1";
 		};
 
 		sata2-led-green {
@@ -118,7 +115,7 @@
 			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&gpio GPIOA_15 GPIO_ACTIVE_LOW>;
 			default-state = "off";
-			/* linux,default-trigger = "ata2"; */
+			linux,default-trigger = "ata2";
 		};
 
 		sata3-led-green {
@@ -126,7 +123,7 @@
 			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&gpio GPIOC_0 GPIO_ACTIVE_LOW>;
 			default-state = "off";
-			/* linux,default-trigger = "ata3"; */
+			linux,default-trigger = "ata3";
 		};
 	};
 
@@ -304,18 +301,15 @@
 
 		interrupt-parent = <&gpio_intc>;
 		/* MAC_INTR on GPIOZ_14 */
-		/* interrupts = <IRQID_GPIOZ_14 IRQ_TYPE_LEVEL_LOW>; */
-		interrupts = <26 IRQ_TYPE_LEVEL_LOW>; /* tested by voltmeter */
+		interrupts = <IRQID_GPIOZ_14 IRQ_TYPE_LEVEL_LOW>; /* tested by voltmeter */
 
-		realtek,led-data = <0xC160>;
+		realtek,led-data = <0xc160>;
 	};
 };
 
-/*
 &npu {
 	status = "okay";
 };
-*/
 
 &pcie {
 	status = "okay";
