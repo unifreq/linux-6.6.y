@@ -67,12 +67,8 @@ config ATA_FORCE
 
 	  If unsure, say Y.
 
-config ARCH_WANT_LIBATA_LEDS
-	bool
-
 config ATA_LEDS
 	bool "support ATA port LED triggers"
-	depends on ARCH_WANT_LIBATA_LEDS
 	select NEW_LEDS
 	select LEDS_CLASS
 	select LEDS_TRIGGERS
