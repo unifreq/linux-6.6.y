@@ -112,7 +112,7 @@
 	sdio_pwrseq: sdio-pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		clocks = <&rk808 1>;
-		clock-names = "lpo";
+		clock-names = "ext_clock";
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_enable_h>;
 		reset-gpios = <&gpio0 RK_PB2 GPIO_ACTIVE_LOW>;
@@ -304,7 +304,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		rtl8211e: ethernet-phy@0 {
+		rtl8211e: rtl8211e@0 {
 			reg = <0>;
 			reset-assert-us = <10000>;
 			reset-deassert-us = <30000>;
@@ -686,7 +686,7 @@
 		};
 	};
 
-	usb2 {
+	usb {
 		vcc5v0_typec0_en: vcc5v0-typec0-en {
 			rockchip,pins = <0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
@@ -748,7 +748,7 @@
 		compatible = "brcm,bcm43455-fmac";
 		reg = <1>;
 		interrupt-parent = <&gpio0>;
-		interrupts = <RK_PA3 GPIO_ACTIVE_HIGH>;
+		interrupts = <RK_PA3 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "host-wake";
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_host_wake_l>;
@@ -793,6 +793,10 @@
 &u2phy0 {
 	status = "okay";
 
+	u2phy0_otg: otg-port {
+		status = "okay";
+	};
+
 	u2phy0_host: host-port {
 		phy-supply = <&usb_vbus>;
 		status = "okay";
@@ -801,6 +805,10 @@
 
 &u2phy1 {
 	status = "okay";
+
+	u2phy1_otg: otg-port {
+		status = "okay";
+	};
 
 	u2phy1_host: host-port {
 		phy-supply = <&usb_vbus>;
