@@ -87,6 +87,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905w-tx3-mini.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905w-x96-mini.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905w-x96w.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905x-b860h.dtb
+dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905x-bestv-r3300-l.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905x-hwacom-amazetv.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905x-khadas-vim.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-gxl-s905x-libretech-cc.dtb
