@@ -144,15 +144,19 @@
 	vpcie3v3-supply = <&vcc3v3_pi6c_05>;
 	status = "okay";
 
-	pcie@0 {
+	pcie@0,0 {
 		reg = <0x00000000 0 0 0 0>;
 		#address-cells = <3>;
 		#size-cells = <2>;
 
+		bus-range = <0x00 0x0f>;
+		device_type = "pci";
+		ranges;
+
 		rtl8125_2: pcie-eth@0,0 {
 			compatible = "pci10ec,8125";
 			label = "eth1";
-			reg = <0x000000 0 0 0 0>;
+			reg = <0x010000 0 0 0 0>;
 
 			/* G+: LED0
 			 * G-: LED1
@@ -195,15 +199,19 @@
 	vpcie3v3-supply = <&vcc3v3_pi6c_05>;
 	status = "okay";
 
-	pcie@0 {
+	pcie@0,0 {
 		reg = <0x00200000 0 0 0 0>;
 		#address-cells = <3>;
 		#size-cells = <2>;
 
-		rtl8125_1: pcie-eth@20,0 {
+		bus-range = <0x20 0x2f>;
+		device_type = "pci";
+		ranges;
+
+		rtl8125_1: pcie-eth@0,0 {
 			compatible = "pci10ec,8125";
 			label = "eth0";
-			reg = <0x000000 0 0 0 0>;
+			reg = <0x210000 0 0 0 0>;
 
 			/* G+: LED0
 			 * G-: LED1
