@@ -652,9 +652,13 @@
 		#address-cells = <3>;
 		#size-cells = <2>;
 
-		rtl8125_1: pcie-eth@10,0 {
+		bus-range = <0x10 0x1f>;
+		device_type = "pci";
+		ranges;
+
+		rtl8125_1: pcie-eth@0,0 {
 			compatible = "pci10ec,8125";
-			reg = <0x000000 0 0 0 0>;
+			reg = <0x110000 0 0 0 0>;
 			label = "eth0";
 
 			/* G+ 3v3
@@ -682,9 +686,13 @@
 		#address-cells = <3>;
 		#size-cells = <2>;
 
-		rtl8125_2: pcie-eth@20,0 {
+		bus-range = <0x20 0x2f>;
+		device_type = "pci";
+		ranges;
+
+		rtl8125_2: pcie-eth@0,0 {
 			compatible = "pci10ec,8125";
-			reg = <0x000000 0 0 0 0>;
+			reg = <0x210000 0 0 0 0>;
 			label = "eth1";
 
 			/* G+ 3v3
