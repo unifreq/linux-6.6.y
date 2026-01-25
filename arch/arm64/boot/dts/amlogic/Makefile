@@ -44,6 +44,7 @@ dtb-$(CONFIG_ARCH_MESON) += meson-g12b-s922x-bananapi-m2s.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-g12b-s922x-khadas-vim3.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-g12b-s922x-oes-plus.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-g12b-s922x-oes-plus-00050000.dtb
+dtb-$(CONFIG_ARCH_MESON) += meson-g12b-s922x-oes-plus-v2.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-g12b-ugoos-am6.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-g12b-ugoos-am6-plus.dtb
 dtb-$(CONFIG_ARCH_MESON) += meson-gxbb-beelink-mini-mx.dtb
