@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2019 BayLibre, SAS
+ * Author: Neil Armstrong <narmstrong@baylibre.com>
+ * Copyright (c) 2019 Christian Hewitt <christianshewitt@gmail.com>
+ * Copyright (c) 2025 retro98boy <retro98boy@qq.com>
+ */
+
+/dts-v1/;
+
+#include "meson-g12b-s922x-oes-plus.dts"
+
+/ {
+	model = "OneThing Cloud OES Plus V2.1";
+};
+
+/* Adjust Ethernet PHY configuration */
+&ethmac {
+	phy-mode = "rgmii-rxid";
+	amlogic,invert-rxclk;
+	amlogic,keep-rx-internal-delay;
+	rx-internal-delay-ps = <1000>;
+	amlogic,rx-delay-ns = <8>;
+};
+
+/* Modify fan thermal control strategy */
+&cpu_thermal {
+	trips {
+		cpu_active {
+			temperature = <55000>; /* 55°C */
+			hysteresis = <8000>;   /* 8°C */
+		};
+	};
+};
